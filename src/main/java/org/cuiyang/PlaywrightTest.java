@@ -1,13 +1,13 @@
 package org.cuiyang;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+import cn.hutool.core.thread.ThreadUtil;
+import cn.hutool.core.util.StrUtil;
+import com.microsoft.playwright.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.*;
 import java.util.Iterator;
 
@@ -18,16 +18,22 @@ import java.util.Iterator;
  * @describe
  */
 public class PlaywrightTest {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException {
         Playwright playwright = Playwright.create();
-
-        String first = "D:\\downloads\\chromium-win64\\chrome-win";
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setExecutablePath(Paths.get(URI.create(first))));
+        String filePath = "D:\\downloads\\chromium-win64\\chrome-win\\chrome.exe";
+        Path path = Paths.get(filePath);
+        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setExecutablePath(path).setHeadless(false));
 //        Browser browser = playwright.chromium().launch();
-        Page page = browser.newPage();
-
+        BrowserContext context = browser.newContext();
+        Page page = context.newPage();
         page.navigate("https://www.baidu.com/");
+        ThreadUtil.sleep(1000);
+        APIRequestContext request = page.request();
+        APIResponse apiResponse = request.get("https://www.baidu.com/?word=123");
+        Keyboard keyboard = page.keyboard();
+        keyboard.down("F12");
+        keyboard.up("F12");
 
-        System.out.println(page.title());
+
     }
 }
