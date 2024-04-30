@@ -3,6 +3,8 @@ package org.cuiyang;
 import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.core.util.StrUtil;
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.options.AriaRole;
+import com.microsoft.playwright.options.LoadState;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,13 +29,12 @@ public class PlaywrightTest {
         BrowserContext context = browser.newContext();
         Page page = context.newPage();
         page.navigate("https://www.baidu.com/");
-        ThreadUtil.sleep(1000);
-        APIRequestContext request = page.request();
-        APIResponse apiResponse = request.get("https://www.baidu.com/?word=123");
-        Keyboard keyboard = page.keyboard();
-        keyboard.down("F12");
-        keyboard.up("F12");
-
+        page.waitForLoadState(LoadState.NETWORKIDLE);
+//        page.pause(); //开启了，就会启动Playwright Inspector调试工具
+//        page.type("#kw", "666");
+        page.locator("#kw").click();
+        page.locator("#kw").fill("666");
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("百度一下")).click();
 
     }
 }
